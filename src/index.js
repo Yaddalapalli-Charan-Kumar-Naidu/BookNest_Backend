@@ -3,7 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 
 import dbConnect from "./config/dbConnect.js";
-
+import authRouter from "./routes/authRouter.js";
 dotenv.config();
 const app=express();
 
@@ -12,6 +12,8 @@ app.use(express.json());
 
 
 dbConnect();
+
+app.use("/api/auth",authRouter);
 
 app.get("/",(req,res)=>{
     res.status(200).send("Server is running");
