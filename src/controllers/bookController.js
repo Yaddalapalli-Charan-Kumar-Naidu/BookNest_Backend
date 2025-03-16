@@ -1,0 +1,119 @@
+import Book from '../models/book.js';
+import cloudinary from '../config/cloudinary.js';
+
+// Create a new book
+const createBook = async (req, res) => {
+    const { title, caption, rating } = req.body;
+
+    try {
+        // Upload image to Cloudinary
+        const result = await cloudinary.uploader.upload(req.file.path, {
+            folder: 'books', // Optional: Save images in a specific folder
+        });
+
+        // Create a new book with the authenticated user's ID
+        const newBook = new Book({
+            title,
+            caption,
+            image: result.secure_url, // Save the Cloudinary URL
+            rating,
+            user: req.user._id, // Attach the authenticated user's ID
+        });
+
+        const savedBook = await newBook.save();
+        res.status(201).json(savedBook);
+    } catch (error) {
+        res.status(500).json({ message: "Something went wrong", error: error.message });
+    }
+};
+
+// Get all books
+const getAllBooks = async (req, res) => {
+    try {
+        const books = await Book.find().populate('user', 'username email'); // Populate user details
+        res.status(200).json(books);
+    } catch (error) {
+        res.status(500).json({ message: "Something went wrong", error: error.message });
+    }
+};
+
+// Get a single book by ID
+const getBookById = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const book = await Book.findById(id).populate('user', 'username email');
+        if (!book) {
+            return res.status(404).json({ message: "Book not found" });
+        }
+        res.status(200).json(book);
+    } catch (error) {
+        res.status(500).json({ message: "Something went wrong", error: error.message });
+    }
+};
+
+// Update a book
+const updateBook = async (req, res) => {
+    const { id } = req.params;
+    const { title, caption, rating } = req.body;
+
+    try {
+        const book = await Book.findById(id);
+        if (!book) {
+            return res.status(404).json({ message: "Book not found" });
+        }
+
+        // Check if the authenticated user is the owner of the book
+        if (book.user.toString() !== req.user._id.toString()) {
+            return res.status(403).json({ message: "You are not authorized to update this book" });
+        }
+
+        // If a new image is uploaded, update the image in Cloudinary
+        if (req.file) {
+            const result = await cloudinary.uploader.upload(req.file.path, {
+                folder: 'books',
+            });
+            book.image = result.secure_url;
+        }
+
+        // Update other fields
+        book.title = title || book.title;
+        book.caption = caption || book.caption;
+        book.rating = rating || book.rating;
+
+        const updatedBook = await book.save();
+        res.status(200).json(updatedBook);
+    } catch (error) {
+        res.status(500).json({ message: "Something went wrong", error: error.message });
+    }
+};
+
+// Delete a book
+const deleteBook = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const book = await Book.findById(id);
+        if (!book) {
+            return res.status(404).json({ message: "Book not found" });
+        }
+
+        // Check if the authenticated user is the owner of the book
+        if (book.user.toString() !== req.user._id.toString()) {
+            return res.status(403).json({ message: "You are not authorized to delete this book" });
+        }
+
+        // Optional: Delete the image from Cloudinary
+        const publicId = book.image.split('/').pop().split('.')[0]; // Extract public ID from URL
+        await cloudinary.uploader.destroy(`books/${publicId}`);
+
+        // Delete the book from the database
+        await Book.findByIdAndDelete(id);
+
+        res.status(200).json({ message: "Book deleted successfully" });
+    } catch (error) {
+        res.status(500).json({ message: "Something went wrong", error: error.message });
+    }
+};
+
+export { createBook, getAllBooks, getBookById, updateBook, deleteBook };

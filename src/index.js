@@ -9,11 +9,14 @@ const app=express();
 
 app.use(cors());
 app.use(express.json());
+app.use('/uploads', express.static('uploads')); 
 
 
 dbConnect();
 
 app.use("/api/auth",authRouter);
+
+app.use('/books', bookRoutes);
 
 app.get("/",(req,res)=>{
     res.status(200).send("Server is running");

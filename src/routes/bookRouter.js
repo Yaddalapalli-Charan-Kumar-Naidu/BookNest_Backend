@@ -5,11 +5,22 @@ import authMiddleware from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
-// Apply authMiddleware to protected routes
-router.post('/', authMiddleware, upload.single('image'), createBook);
-router.get('/', authMiddleware, getAllBooks);
-router.get('/:id', authMiddleware, getBookById);
-router.put('/:id', authMiddleware, upload.single('image'), updateBook);
-router.delete('/:id', authMiddleware, deleteBook);
+// Apply authMiddleware to all routes
+router.use(authMiddleware);
+
+// Create a new book (with image upload)
+router.post('/', upload.single('image'), createBook);
+
+// Get all books
+router.get('/', getAllBooks);
+
+// Get a single book by ID
+router.get('/:id', getBookById);
+
+// Update a book (with optional image upload)
+router.put('/:id', upload.single('image'), updateBook);
+
+// Delete a book
+router.delete('/:id', deleteBook);
 
 export default router;
