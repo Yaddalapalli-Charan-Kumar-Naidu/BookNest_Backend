@@ -5,9 +5,11 @@ import dotenv from 'dotenv';
 import dbConnect from "./config/dbConnect.js";
 import authRouter from "./routes/authRouter.js";
 import bookRouter from "./routes/bookRouter.js";
+import { startCronJob } from "./utils/cron.js";
 dotenv.config();
 const app=express();
 
+startCronJob();
 app.use(cors());
 app.use(express.json());
 app.use('/uploads', express.static('uploads')); 
