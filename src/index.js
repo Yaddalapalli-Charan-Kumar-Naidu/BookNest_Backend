@@ -19,7 +19,7 @@ dbConnect();
 
 app.use("/api/auth",authRouter);
 
-app.use('/books', bookRouter);
+app.use('/api/books', bookRouter);
 
 app.get("/",(req,res)=>{
     res.status(200).send("Server is running");
