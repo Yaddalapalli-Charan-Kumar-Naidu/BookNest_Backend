@@ -1,7 +1,7 @@
 import express from 'express';
 import { createBook, getAllBooks, getBookById, updateBook, deleteBook } from '../controllers/bookController.js';
-import upload from '../middleware/upload.js';
-import authMiddleware from '../middleware/authMiddleware.js';
+import upload from '../middlewares/upload.js';
+import authMiddleware from '../middlewares/authMiddleware.js';
 
 const router = express.Router();
 

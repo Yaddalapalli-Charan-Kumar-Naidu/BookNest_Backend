@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 
 import dbConnect from "./config/dbConnect.js";
 import authRouter from "./routes/authRouter.js";
+import bookRouter from "./routes/bookRouter.js";
 dotenv.config();
 const app=express();
 
@@ -16,7 +17,7 @@ dbConnect();
 
 app.use("/api/auth",authRouter);
 
-app.use('/books', bookRoutes);
+app.use('/books', bookRouter);
 
 app.get("/",(req,res)=>{
     res.status(200).send("Server is running");

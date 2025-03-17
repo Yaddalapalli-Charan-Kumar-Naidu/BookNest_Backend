@@ -1,11 +1,27 @@
 import Book from '../models/book.js';
 import cloudinary from '../config/cloudinary.js';
 
-// Create a new book
 const createBook = async (req, res) => {
     const { title, caption, rating } = req.body;
 
+    // Input validation
+    if (!title || !caption || !rating || !req.file) {
+        return res.status(400).json({ message: "Title, caption, rating, and image are required." });
+    }
+
     try {
+        // Validate image file type and size
+        const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+        const maxSize = 5 * 1024 * 1024; // 5 MB
+
+        if (!allowedTypes.includes(req.file.mimetype)) {
+            return res.status(400).json({ message: "Invalid file type. Only JPEG, PNG, or JPG allowed." });
+        }
+
+        if (req.file.size > maxSize) {
+            return res.status(400).json({ message: "File size exceeds the 5MB limit." });
+        }
+
         // Upload image to Cloudinary
         const result = await cloudinary.uploader.upload(req.file.path, {
             folder: 'books', // Optional: Save images in a specific folder
@@ -20,12 +36,17 @@ const createBook = async (req, res) => {
             user: req.user._id, // Attach the authenticated user's ID
         });
 
+        // Save the new book to the database
         const savedBook = await newBook.save();
         res.status(201).json(savedBook);
+
     } catch (error) {
-        res.status(500).json({ message: "Something went wrong", error: error.message });
+        console.error(error);
+        res.status(500).json({ message: "Something went wrong while creating the book", error: error.message });
     }
 };
+
+
 
 // Get all books
 const getAllBooks = async (req, res) => {
