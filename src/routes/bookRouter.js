@@ -12,7 +12,7 @@ router.get("/",(req,res)=>{
 router.use(authMiddleware);
 
 // Create a new book (with image upload)
-router.post('/', upload.single('image'), createBook);
+router.post('/', createBook);
 
 // Get all books
 router.get('/', getAllBooks);
@@ -21,7 +21,7 @@ router.get('/', getAllBooks);
 router.get('/:id', getBookById);
 
 // Update a book (with optional image upload)
-router.put('/:id', upload.single('image'), updateBook);
+router.put('/:id', updateBook);
 
 // Delete a book
 router.delete('/:id', deleteBook);

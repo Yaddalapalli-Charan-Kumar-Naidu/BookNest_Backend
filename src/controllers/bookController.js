@@ -2,28 +2,18 @@ import Book from '../models/book.js';
 import cloudinary from '../config/cloudinary.js';
 
 const createBook = async (req, res) => {
-    const { title, caption, rating } = req.body;
+    const { title, caption, rating,image } = req.body;
 
     // Input validation
-    if (!title || !caption || !rating || !req.file) {
+    if (!title || !caption || !rating || !image) {
         return res.status(400).json({ message: "Title, caption, rating, and image are required." });
     }
 
     try {
         // Validate image file type and size
-        const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
-        const maxSize = 5 * 1024 * 1024; // 5 MB
-
-        if (!allowedTypes.includes(req.file.mimetype)) {
-            return res.status(400).json({ message: "Invalid file type. Only JPEG, PNG, or JPG allowed." });
-        }
-
-        if (req.file.size > maxSize) {
-            return res.status(400).json({ message: "File size exceeds the 5MB limit." });
-        }
-
+        
         // Upload image to Cloudinary
-        const result = await cloudinary.uploader.upload(req.file.path, {
+        const result = await cloudinary.uploader.upload(image, {
             folder: 'books', // Optional: Save images in a specific folder
         });
 
