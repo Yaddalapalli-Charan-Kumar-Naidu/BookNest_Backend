@@ -66,7 +66,7 @@ const getBookById = async (req, res) => {
 // Update a book
 const updateBook = async (req, res) => {
     const { id } = req.params;
-    const { title, caption, rating } = req.body;
+    const { title, caption, rating,image } = req.body;
 
     try {
         const book = await Book.findById(id);
@@ -80,17 +80,18 @@ const updateBook = async (req, res) => {
         }
 
         // If a new image is uploaded, update the image in Cloudinary
-        if (req.file) {
-            const result = await cloudinary.uploader.upload(req.file.path, {
+       
+            const result = await cloudinary.uploader.upload(image, {
                 folder: 'books',
             });
             book.image = result.secure_url;
-        }
+        
 
         // Update other fields
         book.title = title || book.title;
         book.caption = caption || book.caption;
         book.rating = rating || book.rating;
+        book.image=image||book.image;
 
         const updatedBook = await book.save();
         res.status(200).json(updatedBook);
