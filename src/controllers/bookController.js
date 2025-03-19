@@ -41,13 +41,31 @@ const createBook = async (req, res) => {
 // Get all books
 const getAllBooks = async (req, res) => {
     try {
-        const books = await Book.find().populate('user', 'username email'); // Populate user details
-        res.status(200).json(books);
+      const { page = 1, limit = 3 } = req.query;
+  
+      const books = await Book.find()
+        .sort({ createdAt: -1 })
+        .skip((page - 1) * limit)
+        .limit(parseInt(limit))
+        .populate('user', 'username email profileImage'); // 👈 added profileImage here
+  
+      const total = await Book.countDocuments();
+  
+      res.status(200).json({
+        total,
+        page: parseInt(page),
+        limit: parseInt(limit),
+        totalPages: Math.ceil(total / limit),
+        books,
+      });
     } catch (error) {
-        res.status(500).json({ message: "Something went wrong", error: error.message });
+      res.status(500).json({
+        message: "Something went wrong",
+        error: error.message,
+      });
     }
-};
-
+  };
+  
 // Get a single book by ID
 const getBookById = async (req, res) => {
     const { id } = req.params;

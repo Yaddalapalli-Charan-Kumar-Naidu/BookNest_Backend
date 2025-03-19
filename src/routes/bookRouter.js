@@ -5,9 +5,7 @@ import authMiddleware from '../middlewares/authMiddleware.js';
 
 const router = express.Router();
 
-router.get("/",(req,res)=>{
-    res.send("books");
-})
+
 // Apply authMiddleware to all routes
 router.use(authMiddleware);
 
