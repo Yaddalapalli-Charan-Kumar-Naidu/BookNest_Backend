@@ -69,7 +69,7 @@ const getAllBooks = async (req, res) => {
     const userId = req.user._id;
 
     try {
-        const books = await Book.find({ user: userId });
+        const books = await Book.find({ user: userId }).sort({ createdAt: -1 });
 
         if (!books || books.length === 0) {
             return res.status(404).json({ message: "No book recommendations found." });
