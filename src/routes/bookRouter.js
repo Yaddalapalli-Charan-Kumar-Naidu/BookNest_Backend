@@ -15,15 +15,15 @@ router.post('/', createBook);
 router.get('/', getAllBooks);
 
 //get particular user recommendations
-router.get("/user",authMiddleware,userBooks)
+router.get("/user",userBooks)
 
 // Get a single book by ID
 router.get('/:id', getBookById);
 
 // Update a book (with optional image upload)
-router.put('/:id',authMiddleware, updateBook);
+router.put('/:id', updateBook);
 
 // Delete a book
-router.delete('/:id',authMiddleware, deleteBook);
+router.delete('/:id', deleteBook);
 
 export default router;
