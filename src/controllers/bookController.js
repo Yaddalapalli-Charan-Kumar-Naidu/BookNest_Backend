@@ -65,6 +65,28 @@ const getAllBooks = async (req, res) => {
       });
     }
   };
+  const userBooks = async (req, res) => {
+    const userId = req.user._id;
+
+    try {
+        const books = await Book.find({ user: userId });
+
+        if (!books || books.length === 0) {
+            return res.status(404).json({ message: "No book recommendations found." });
+        }
+
+        res.status(200).json({
+            message: "Book recommendations fetched successfully.",
+            books
+        });
+    } catch (err) {
+        res.status(500).json({
+            message: "Something went wrong.",
+            error: err.message
+        });
+    }
+};
+
   
 // Get a single book by ID
 const getBookById = async (req, res) => {
@@ -85,7 +107,6 @@ const getBookById = async (req, res) => {
 const updateBook = async (req, res) => {
     const { id } = req.params;
     const { title, caption, rating,image } = req.body;
-
     try {
         const book = await Book.findById(id);
         if (!book) {
@@ -146,4 +167,4 @@ const deleteBook = async (req, res) => {
     }
 };
 
-export { createBook, getAllBooks, getBookById, updateBook, deleteBook };
+export { createBook, getAllBooks, getBookById, updateBook, deleteBook ,userBooks};

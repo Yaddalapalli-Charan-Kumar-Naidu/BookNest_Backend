@@ -1,6 +1,5 @@
 import express from 'express';
-import { createBook, getAllBooks, getBookById, updateBook, deleteBook } from '../controllers/bookController.js';
-import upload from '../middlewares/upload.js';
+import { createBook, getAllBooks, getBookById, updateBook, deleteBook, userBooks } from '../controllers/bookController.js';
 import authMiddleware from '../middlewares/authMiddleware.js';
 
 const router = express.Router();
@@ -15,13 +14,16 @@ router.post('/', createBook);
 // Get all books
 router.get('/', getAllBooks);
 
+//get particular user recommendations
+router.get("/user",authMiddleware,userBooks)
+
 // Get a single book by ID
 router.get('/:id', getBookById);
 
 // Update a book (with optional image upload)
-router.put('/:id', updateBook);
+router.put('/:id',authMiddleware, updateBook);
 
 // Delete a book
-router.delete('/:id', deleteBook);
+router.delete('/:id',authMiddleware, deleteBook);
 
 export default router;
